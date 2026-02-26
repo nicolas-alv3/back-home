@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { X, Plus, Trash2, Image as ImageIcon } from "lucide-react";
+import { useState, useRef } from "react";
+import { X, Plus, Trash2, Image as ImageIcon, Upload } from "lucide-react";
 import type { GraphData, Entity, Relationship } from "../types";
 
 interface DataEditorProps {
@@ -34,6 +34,16 @@ export function DataEditor({ data, onSave, onClose }: DataEditorProps) {
         setEntities(entities.filter(e => e.id !== id));
         // Also remove relationships involving this entity
         setRelationships(relationships.filter(r => r.source !== id && r.target !== id));
+    };
+
+    const handleImageUpload = (id: string, file: File) => {
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            const base64String = reader.result as string;
+            updateEntity(id, "image", base64String);
+        };
+        reader.readAsDataURL(file);
     };
 
     const addRelationship = () => {
@@ -114,8 +124,27 @@ export function DataEditor({ data, onSave, onClose }: DataEditorProps) {
                                             <textarea rows={2} value={entity.description || ""} onChange={e => updateEntity(entity.id, "description", e.target.value)} className="w-full px-3 py-2 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] bg-gray-50" />
                                         </div>
                                         <div className="md:col-span-2">
-                                            <label className="block text-sm font-semibold text-gray-600 mb-1 flex items-center gap-2"><ImageIcon className="w-4 h-4" /> URL de la Foto</label>
-                                            <input type="text" placeholder="https://..." value={entity.image || ""} onChange={e => updateEntity(entity.id, "image", e.target.value)} className="w-full px-3 py-2 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] bg-gray-50" />
+                                            <label className="block text-sm font-semibold text-gray-600 mb-1 flex items-center gap-2"><ImageIcon className="w-4 h-4" /> URL de la Foto o Subir Archivo</label>
+                                            <div className="flex gap-2">
+                                                <input type="text" placeholder="https://..." value={entity.image || ""} onChange={e => updateEntity(entity.id, "image", e.target.value)} className="flex-1 px-3 py-2 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] bg-gray-50" />
+                                                <label className="flex items-center justify-center px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl cursor-pointer transition-colors shadow-sm whitespace-nowrap">
+                                                    <Upload className="w-4 h-4 mr-2" />
+                                                    Subir Foto
+                                                    <input
+                                                        type="file"
+                                                        accept="image/*"
+                                                        className="hidden"
+                                                        onChange={(e) => {
+                                                            if (e.target.files?.[0]) {
+                                                                handleImageUpload(entity.id, e.target.files[0]);
+                                                            }
+                                                        }}
+                                                    />
+                                                </label>
+                                            </div>
+                                            {entity.image && entity.image.length > 200 && (
+                                                <p className="text-xs text-green-600 mt-1 font-medium select-none">✓ Imagen local guardada exitosamente.</p>
+                                            )}
                                         </div>
                                     </div>
                                 </div>
