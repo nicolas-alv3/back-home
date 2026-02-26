@@ -18,7 +18,10 @@ export default function Home() {
     const saved = localStorage.getItem("backHomeData");
     if (saved) {
       try {
-        setSavedData(JSON.parse(saved));
+        const parsedData = JSON.parse(saved);
+        setSavedData(parsedData);
+        setData(parsedData);
+        setView("graph");
       } catch (err) {
         console.error("Error al leer localStorage:", err);
       }
