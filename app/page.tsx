@@ -3,11 +3,13 @@
 import { useState, useEffect } from "react";
 import { FileUploader } from "./components/FileUploader";
 import { Graph } from "./components/Graph";
+import { DataEditor } from "./components/DataEditor";
 import type { GraphData } from "./types";
-import { Heart, RefreshCcw } from "lucide-react";
+import { Heart, RefreshCcw, Download, Edit3 } from "lucide-react";
 
 export default function Home() {
   const [data, setData] = useState<GraphData | null>(null);
+  const [isEditorOpen, setIsEditorOpen] = useState(false);
 
   useEffect(() => {
     // Intentar recuperar los datos del localStorage
@@ -31,6 +33,19 @@ export default function Home() {
     localStorage.removeItem("backHomeData");
   };
 
+  const handleExport = () => {
+    if (!data) return;
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "backhome.json";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-between">
       <header className="w-full bg-white shadow-sm py-4 px-6 flex items-center justify-between border-b border-[var(--color-primary)]/20 shadow-[var(--color-primary)]/10 z-10 relative">
@@ -49,13 +64,29 @@ export default function Home() {
         </div>
 
         {data && (
-          <button
-            onClick={handleReset}
-            className="flex items-center gap-2 px-4 py-2 bg-[var(--color-secondary)]/10 hover:bg-[var(--color-secondary)]/20 text-[var(--color-secondary)] transition-colors rounded-full font-medium shadow-sm"
-          >
-            <RefreshCcw className="w-4 h-4" />
-            Cargar otro
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setIsEditorOpen(true)}
+              className="flex items-center gap-2 px-4 py-2 bg-[var(--color-primary)]/10 hover:bg-[var(--color-primary)]/20 text-[var(--color-primary)] transition-colors rounded-full font-medium shadow-sm"
+            >
+              <Edit3 className="w-4 h-4" />
+              Editar Vínculos
+            </button>
+            <button
+              onClick={handleExport}
+              className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors rounded-full font-medium shadow-sm"
+            >
+              <Download className="w-4 h-4" />
+              Exportar
+            </button>
+            <button
+              onClick={handleReset}
+              className="flex items-center gap-2 px-4 py-2 bg-[var(--color-secondary)]/10 hover:bg-[var(--color-secondary)]/20 text-[var(--color-secondary)] transition-colors rounded-full font-medium shadow-sm"
+            >
+              <RefreshCcw className="w-4 h-4" />
+              Cargar otro
+            </button>
+          </div>
         )}
       </header>
 
@@ -79,6 +110,17 @@ export default function Home() {
           </div>
         )}
       </div>
+
+      {isEditorOpen && data && (
+        <DataEditor
+          data={data}
+          onSave={(newData) => {
+            handleDataLoaded(newData);
+            setIsEditorOpen(false);
+          }}
+          onClose={() => setIsEditorOpen(false)}
+        />
+      )}
     </main>
   );
 }
