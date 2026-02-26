@@ -10,16 +10,16 @@ interface NodeDetailsProps {
 }
 
 export function NodeDetails({ entity, onClose }: NodeDetailsProps) {
-    const [isImageMaximized, setIsImageMaximized] = useState(false);
+    const [maximizedImg, setMaximizedImg] = useState<string | null>(null);
     const isAnimal = ["animal", "perro", "gato", "mascota"].includes(
         entity.type.toLowerCase()
     );
 
-    const imageUrl = entity.image?.startsWith("http") || entity.image?.startsWith("data:image/")
-        ? entity.image
-        : entity.image
-            ? `/images/${entity.image}`
-            : null;
+    const entityImages = entity.images && entity.images.length > 0 ? entity.images : (entity.image ? [entity.image] : []);
+    const parsedImages = entityImages
+        .filter(img => img.trim() !== "")
+        .map(img => img.startsWith("http") || img.startsWith("data:image/") ? img : `/images/${img}`);
+    const imageUrl = parsedImages.length > 0 ? parsedImages[0] : null;
 
     return (
         <>
@@ -39,7 +39,7 @@ export function NodeDetails({ entity, onClose }: NodeDetailsProps) {
                 <div className="p-6 flex flex-col items-center">
                     <div
                         className={`w-24 h-24 rounded-full bg-[var(--color-primary)]/20 mb-4 flex items-center justify-center overflow-hidden border-4 border-white shadow-lg relative shrink-0 ${imageUrl ? 'cursor-pointer group' : ''}`}
-                        onClick={() => imageUrl && setIsImageMaximized(true)}
+                        onClick={() => imageUrl && setMaximizedImg(imageUrl)}
                     >
                         {imageUrl ? (
                             <>
@@ -75,22 +75,41 @@ export function NodeDetails({ entity, onClose }: NodeDetailsProps) {
                             <ReactMarkdown>{entity.description}</ReactMarkdown>
                         </div>
                     )}
+
+                    {parsedImages.length > 1 && (
+                        <div className="mt-6 w-full">
+                            <h4 className="text-xs font-bold text-gray-400 mb-3 text-center uppercase tracking-wider">Galería</h4>
+                            <div className="flex justify-center gap-3 flex-wrap">
+                                {parsedImages.map((img, idx) => (
+                                    <img
+                                        key={idx}
+                                        src={img}
+                                        alt={`Foto ${idx + 1} de ${entity.name}`}
+                                        title={`Ver imagen ${idx + 1}`}
+                                        onClick={() => setMaximizedImg(img)}
+                                        className="w-16 h-16 rounded-xl object-cover border-2 border-[var(--color-primary)]/20 shadow-sm cursor-pointer hover:border-[var(--color-primary)] hover:scale-105 transition-all"
+                                        onError={(e) => { e.currentTarget.style.display = "none"; }}
+                                    />
+                                ))}
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
 
-            {isImageMaximized && imageUrl && (
+            {maximizedImg && (
                 <div
                     className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200"
-                    onClick={() => setIsImageMaximized(false)}
+                    onClick={() => setMaximizedImg(null)}
                 >
                     <button
                         className="absolute top-6 right-6 p-2 bg-white/10 hover:bg-white/20 text-white rounded-full transition-colors z-[101]"
-                        onClick={() => setIsImageMaximized(false)}
+                        onClick={() => setMaximizedImg(null)}
                     >
                         <X className="w-8 h-8" />
                     </button>
                     <img
-                        src={imageUrl}
+                        src={maximizedImg}
                         alt={entity.name}
                         className="max-w-[90vw] max-h-[90vh] object-contain rounded-xl shadow-2xl border border-white/10"
                         onClick={(e) => e.stopPropagation()}

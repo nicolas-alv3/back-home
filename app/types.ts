@@ -6,6 +6,7 @@ export interface Entity {
     type: EntityType | string;
     description?: string;
     image?: string;
+    images?: string[];
 }
 
 export interface Relationship {

@@ -41,7 +41,13 @@ export function DataEditor({ data, onSave, onClose }: DataEditorProps) {
         const reader = new FileReader();
         reader.onloadend = () => {
             const base64String = reader.result as string;
-            updateEntity(id, "image", base64String);
+            const entity = entities.find(e => e.id === id);
+            if (entity) {
+                const currentImages = (entity.images && entity.images.length > 0) ? entity.images : (entity.image ? [entity.image] : []);
+                if (currentImages.length < 3) {
+                    updateEntity(id, "images", [...currentImages, base64String] as any);
+                }
+            }
         };
         reader.readAsDataURL(file);
     };
@@ -124,27 +130,71 @@ export function DataEditor({ data, onSave, onClose }: DataEditorProps) {
                                             <textarea rows={2} value={entity.description || ""} onChange={e => updateEntity(entity.id, "description", e.target.value)} className="w-full px-3 py-2 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] bg-gray-50" />
                                         </div>
                                         <div className="md:col-span-2">
-                                            <label className="block text-sm font-semibold text-gray-600 mb-1 flex items-center gap-2"><ImageIcon className="w-4 h-4" /> URL de la Foto o Subir Archivo</label>
-                                            <div className="flex gap-2">
-                                                <input type="text" placeholder="https://..." value={entity.image || ""} onChange={e => updateEntity(entity.id, "image", e.target.value)} className="flex-1 px-3 py-2 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] bg-gray-50" />
-                                                <label className="flex items-center justify-center px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl cursor-pointer transition-colors shadow-sm whitespace-nowrap">
-                                                    <Upload className="w-4 h-4 mr-2" />
-                                                    Subir Foto
-                                                    <input
-                                                        type="file"
-                                                        accept="image/*"
-                                                        className="hidden"
-                                                        onChange={(e) => {
-                                                            if (e.target.files?.[0]) {
-                                                                handleImageUpload(entity.id, e.target.files[0]);
-                                                            }
-                                                        }}
-                                                    />
-                                                </label>
-                                            </div>
-                                            {entity.image && entity.image.length > 200 && (
-                                                <p className="text-xs text-green-600 mt-1 font-medium select-none">✓ Imagen local guardada exitosamente.</p>
-                                            )}
+                                            <label className="block text-sm font-semibold text-gray-600 mb-2 flex items-center gap-2">
+                                                <ImageIcon className="w-4 h-4" /> Fotos (Máximo 3)
+                                            </label>
+
+                                            {(() => {
+                                                const currentImages = (entity.images && entity.images.length > 0) ? entity.images : (entity.image ? [entity.image] : []);
+                                                return (
+                                                    <div className="flex flex-col gap-3">
+                                                        {currentImages.map((img, idx) => (
+                                                            <div key={idx} className="flex gap-2 items-center">
+                                                                <span className="text-xs font-bold text-gray-400 bg-gray-100 px-2 py-1 rounded-md">{idx + 1}</span>
+                                                                <input
+                                                                    type="text"
+                                                                    placeholder="https://... o Base64"
+                                                                    value={img || ""}
+                                                                    onChange={e => {
+                                                                        const newImgs = [...currentImages];
+                                                                        newImgs[idx] = e.target.value;
+                                                                        updateEntity(entity.id, "images", newImgs as any);
+                                                                    }}
+                                                                    className="flex-1 px-3 py-2 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] bg-gray-50 text-sm"
+                                                                />
+                                                                <button
+                                                                    onClick={() => {
+                                                                        const newImgs = currentImages.filter((_, i) => i !== idx);
+                                                                        updateEntity(entity.id, "images", newImgs as any);
+                                                                        if (idx === 0) updateEntity(entity.id, "image", "" as any); // fallback clear
+                                                                    }}
+                                                                    className="px-3 py-2 text-red-500 hover:bg-red-50 hover:text-red-700 bg-white border border-gray-200 rounded-xl transition-colors shadow-sm"
+                                                                >
+                                                                    <Trash2 className="w-4 h-4" />
+                                                                </button>
+                                                            </div>
+                                                        ))}
+
+                                                        {currentImages.length < 3 && (
+                                                            <div className="flex gap-2 mt-1">
+                                                                <button
+                                                                    onClick={() => {
+                                                                        const newImgs = [...currentImages, ""];
+                                                                        updateEntity(entity.id, "images", newImgs as any);
+                                                                    }}
+                                                                    className="flex-1 py-2 border-2 border-dashed border-gray-300 rounded-xl text-gray-500 hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] transition-colors text-sm font-medium flex items-center justify-center gap-2 bg-gray-50/50"
+                                                                >
+                                                                    <Plus className="w-4 h-4" /> Añadir URL vacía
+                                                                </button>
+                                                                <label className="flex items-center justify-center px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl cursor-pointer transition-colors shadow-sm whitespace-nowrap text-sm font-medium border border-gray-200">
+                                                                    <Upload className="w-4 h-4 mr-2" />
+                                                                    Subir Archivo
+                                                                    <input
+                                                                        type="file"
+                                                                        accept="image/*"
+                                                                        className="hidden"
+                                                                        onChange={(e) => {
+                                                                            if (e.target.files?.[0]) {
+                                                                                handleImageUpload(entity.id, e.target.files[0]);
+                                                                            }
+                                                                        }}
+                                                                    />
+                                                                </label>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                );
+                                            })()}
                                         </div>
                                     </div>
                                 </div>

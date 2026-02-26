@@ -6,10 +6,11 @@ export function CustomNode({ data, selected }: any) {
         (data.type || "").toLowerCase()
     );
 
-    const imageUrl = data.image?.startsWith("http") || data.image?.startsWith("data:image/")
-        ? data.image
-        : data.image
-            ? `/images/${data.image}`
+    const firstImage = (data.images && data.images.length > 0) ? data.images[0] : data.image;
+    const imageUrl = firstImage?.startsWith("http") || firstImage?.startsWith("data:image/")
+        ? firstImage
+        : firstImage
+            ? `/images/${firstImage}`
             : null;
 
     const bgColor = isAnimal ? "bg-[var(--color-primary)]" : "bg-[var(--color-secondary)]";
