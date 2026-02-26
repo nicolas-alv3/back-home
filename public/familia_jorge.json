@@ -1,0 +1,88 @@
+{
+    "entities": [
+        {
+            "id": "1",
+            "name": "Jorge",
+            "type": "persona",
+            "description": "El **abuelo**. Le encanta la _jardinería_ y contar historias de su juventud en el campo.\n\n* Siempre tiene un mate listo.",
+            "image": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&h=200&fit=crop"
+        },
+        {
+            "id": "2",
+            "name": "Ángel Jorge",
+            "type": "persona",
+            "description": "El **padre**. Apasionado por la mecánica y los autos clásicos. Siempre está arreglando algo en el garaje.\n\n[Ver su auto favorito](https://es.wikipedia.org/wiki/Ford_Motor_Company)",
+            "image": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&h=200&fit=crop"
+        },
+        {
+            "id": "3",
+            "name": "Natalia",
+            "type": "persona",
+            "description": "La **madre**. Es profesora de literatura, le encanta leer novelas de misterio y cocinar pastas los domingos.\n\n> \"La vida es un buen libro de recetas.\"",
+            "image": "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&h=200&fit=crop"
+        },
+        {
+            "id": "4",
+            "name": "Maxi",
+            "type": "persona",
+            "description": "Hijo **mayor**. Programador, pasa horas frente a la computadora y le gusta jugar al fútbol con amigos. Su lenguaje favorito:\n```javascript\nconsole.log('Hola Mundo');\n```",
+            "image": "https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=200&h=200&fit=crop"
+        },
+        {
+            "id": "5",
+            "name": "Nico",
+            "type": "persona",
+            "description": "Hijo **menor**. Estudia diseño gráfico, toca la guitarra y siempre está dibujando en su cuaderno.\n-🎸 Rock \n-🎨 Dibujo",
+            "image": "https://images.unsplash.com/photo-1527980965255-d3b416303d12?w=200&h=200&fit=crop"
+        },
+        {
+            "id": "6",
+            "name": "Cero",
+            "type": "perro",
+            "description": "El perro de **Maxi**. Es muy juguetón, le encanta correr detrás de las pelotas y dormir al sol.\n`¡Guau!`",
+            "image": "https://images.unsplash.com/photo-1517849845537-4d257902454a?w=200&h=200&fit=crop"
+        }
+    ],
+    "relationships": [
+        {
+            "source": "1",
+            "target": "2",
+            "relation": "padre"
+        },
+        {
+            "source": "2",
+            "target": "3",
+            "relation": "esposo"
+        },
+        {
+            "source": "3",
+            "target": "2",
+            "relation": "esposa"
+        },
+        {
+            "source": "2",
+            "target": "4",
+            "relation": "padre"
+        },
+        {
+            "source": "3",
+            "target": "4",
+            "relation": "madre"
+        },
+        {
+            "source": "2",
+            "target": "5",
+            "relation": "padre"
+        },
+        {
+            "source": "3",
+            "target": "5",
+            "relation": "madre"
+        },
+        {
+            "source": "4",
+            "target": "6",
+            "relation": "dueño"
+        }
+    ]
+}

@@ -1,26 +1,17 @@
 @import "tailwindcss";
-
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@import "@xyflow/react/dist/style.css";
+@plugin "@tailwindcss/typography";
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-warm-beige: #FDF6EC;
+  --color-primary: #F4A261;
+  --color-secondary: #2A9D8F;
+  --color-text-main: #264653;
+  --color-accent: #E76F51;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: #FDF6EC;
+  color: #264653;
+  font-family: var(--font-nunito), Arial, Helvetica, sans-serif;
 }
