@@ -38,15 +38,48 @@ export function DataEditor({ data, onSave, onClose }: DataEditorProps) {
 
     const handleImageUpload = (id: string, file: File) => {
         if (!file) return;
+
         const reader = new FileReader();
-        reader.onloadend = () => {
-            const base64String = reader.result as string;
-            const entity = entities.find(e => e.id === id);
-            if (entity) {
-                const currentImages = (entity.images && entity.images.length > 0) ? entity.images : (entity.image ? [entity.image] : []);
-                if (currentImages.length < 3) {
-                    updateEntity(id, "images", [...currentImages, base64String] as any);
+        reader.onload = (e) => {
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                const MAX_WIDTH = 800;
+                const MAX_HEIGHT = 800;
+                let width = img.width;
+                let height = img.height;
+
+                if (width > height) {
+                    if (width > MAX_WIDTH) {
+                        height = Math.round((height * MAX_WIDTH) / width);
+                        width = MAX_WIDTH;
+                    }
+                } else {
+                    if (height > MAX_HEIGHT) {
+                        width = Math.round((width * MAX_HEIGHT) / height);
+                        height = MAX_HEIGHT;
+                    }
                 }
+
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                if (ctx) {
+                    ctx.drawImage(img, 0, 0, width, height);
+                    // Comprimir la imagen para evitar QuotaExceededError en localStorage (límite ~5MB)
+                    const base64String = canvas.toDataURL("image/jpeg", 0.7);
+
+                    const entity = entities.find(e => e.id === id);
+                    if (entity) {
+                        const currentImages = (entity.images && entity.images.length > 0) ? entity.images : (entity.image ? [entity.image] : []);
+                        if (currentImages.length < 3) {
+                            updateEntity(id, "images", [...currentImages, base64String] as any);
+                        }
+                    }
+                }
+            };
+            if (typeof e.target?.result === 'string') {
+                img.src = e.target.result;
             }
         };
         reader.readAsDataURL(file);

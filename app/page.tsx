@@ -30,7 +30,12 @@ export default function Home() {
 
   const handleDataLoaded = (newData: GraphData) => {
     setData(newData);
-    localStorage.setItem("backHomeData", JSON.stringify(newData));
+    try {
+      localStorage.setItem("backHomeData", JSON.stringify(newData));
+    } catch (err) {
+      console.error("Error al guardar en localStorage:", err);
+      alert("Hubo un problema al guardar los datos localmente (el archivo o las fotos son demasiado grandes). El límite suele ser de ~5MB.");
+    }
     setSavedData(newData);
     setView("graph");
   };
