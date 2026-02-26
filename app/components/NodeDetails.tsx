@@ -15,7 +15,7 @@ export function NodeDetails({ entity, onClose }: NodeDetailsProps) {
         entity.type.toLowerCase()
     );
 
-    const imageUrl = entity.image?.startsWith("http")
+    const imageUrl = entity.image?.startsWith("http") || entity.image?.startsWith("data:image/")
         ? entity.image
         : entity.image
             ? `/images/${entity.image}`

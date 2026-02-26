@@ -6,7 +6,7 @@ export function CustomNode({ data, selected }: any) {
         (data.type || "").toLowerCase()
     );
 
-    const imageUrl = data.image?.startsWith("http")
+    const imageUrl = data.image?.startsWith("http") || data.image?.startsWith("data:image/")
         ? data.image
         : data.image
             ? `/images/${data.image}`
